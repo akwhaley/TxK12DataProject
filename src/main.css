@@ -1,0 +1,40 @@
+
+a {
+  cursor: pointer;
+}
+
+html,
+body {
+  background: #D6D6CE;
+  font-family: Verdana, Geneva, sans-serif;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+#app .map path{
+  fill: #ddd;
+  stroke: #aaa;
+}
+
+#tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: #3a3838;
+  color: #D6D6CE;
+  font-size: 10px;
+  border-radius: 10px;
+  padding: 5px;
+  min-width: 200px;
+}
+
+rect {
+  border: black solid 1px;
+}
+
+.legend {
+  border: black solid 1px;
+  background-color: white;
+  color: black;
+}
