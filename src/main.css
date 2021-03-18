@@ -1,6 +1,8 @@
 
 a {
   cursor: pointer;
+  color: #c9a305;
+  font-weight: bold;
 }
 
 html,
@@ -72,10 +74,6 @@ body {
   color: #D6D6CE;
   padding: 20px;
   font-size: 11px;
-}
-
-#sources a {
-  color: #c9a305;
 }
 
 #tooltip {
