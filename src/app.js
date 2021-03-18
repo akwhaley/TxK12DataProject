@@ -3,9 +3,9 @@ import {select} from 'd3-selection';
 import {format} from 'd3-format';
 import {geoEquirectangular, geoPath} from 'd3-geo';
 import {transition} from 'd3-transition';
-import {scaleLinear, scaleOrdinal} from 'd3-scale';
+import {scaleLinear, scaleOrdinal, scaleBand} from 'd3-scale';
 import {extent} from 'd3-array';
-import {axisBottom, axisLeft} from 'd3-axis';
+import {axisBottom, axisLeft, axisTop} from 'd3-axis';
 import {interpolateTurbo} from 'd3-scale-chromatic';
 import './main.css';
 
@@ -23,8 +23,16 @@ Promise.all([
   fetch('./data/district.json').then(x => x.json())
 ]).then(myVis);
 
+//Some helpful functions
 function unique(data, key) {
   return Array.from(data.reduce((acc, row) => acc.add(row[key]), new Set()));
+}
+
+function sortByKey(data, key) {
+  data.sort((a, b) => {
+    return a.key - b.key;
+});
+
 }
 
 function myVis(data) {
@@ -176,17 +184,92 @@ function myVis(data) {
     .attr('id', 'tooltip')
     .style('display', 'none');
 
-  function clickAndLog(d) {
-    console.log(d.DistrictID);
-    console.log(campuses[d.DistrictID]);
+  function clickAndLog(data) {
+
+    select('#bottom-panel').remove();
+    const schoolData = campuses[data.DistrictID].sort((a, b) => {
+      return a.Overperformance - b.Overperformance;
+    });
+    console.log(schoolData);
+
+    const plotWidth = 500;
+    const margin = {top: 50, left: 200, right: 10, bottom: 40};
+
+    const schools = unique(schoolData, 'CampusName');
+    const plotHeight = 20*schools.length;
+
+    const width = plotWidth + margin.left + margin.right;
+    const height = plotHeight + margin.top + margin.bottom;
+
+    const yScale = scaleBand()
+      .domain(schools)
+      .range([0, plotHeight]);
+
+    const xScale = scaleLinear()
+      .domain([50, 100])
+      .range([0, plotWidth]);
+
+
     const bottomPanel = select('#app')
       .append('div')
+      .attr('width', width)
+      .attr('height', height)
       .attr('id', 'bottom-panel')
       .style('position', 'relative');
 
-    bottomPanel.append('text')
+    bottomPanel.append('h3')
       .attr('id', 'bp-title')
-      .text(campuses[d.DistrictID][0]['CampusName']);
+      .text(campuses[data.DistrictID][0]['DistrictName']);
+
+    const svg = bottomPanel.append("svg")
+      .attr('id', 'bp-svg')
+      .attr('width', width)
+      .attr('height', height)
+      .attr('transform', `translate(0,0)`);
+
+    svg
+      .append('g')
+      .attr('class', 'x-axis')
+      .attr('transform', `translate(${margin.left}, ${margin.top/2})`)
+      .call(axisTop(xScale));
+
+    const g = svg.append("g")
+        .attr("text-anchor", "end")
+        .attr("transform", `translate(${margin.left}, ${margin.top})`)
+          .style("font", "10px sans-serif")
+      .selectAll("g")
+      .data(schoolData)
+      .join("g")
+        .attr('class', 'bp-label')
+        .attr("transform", (d, i) => `translate(0,${yScale(d.CampusName)})`);
+
+    g.append("line")
+        .attr("stroke", "#aaa")
+        .attr("x1", d => xScale(d.OverallScore))
+        .attr("x2", d => xScale(d.ModelOverallScore));
+
+    g.append("circle")
+        .attr("cx", d => xScale(d.OverallScore))
+        .attr("fill", "#940000")
+        .attr("r", 3.5);
+
+    g.append("circle")
+        .attr("cx", d => xScale(d.ModelOverallScore))
+        .attr("fill", "#334e8b")
+        .attr("r", 3.5);
+
+    g.append("text")
+      .text((d, i) => d.CampusName)
+      .attr("x", d => Math.min(xScale(d.ModelOverallScore), xScale(d.OverallScore))-10);
+
+    svg
+      .append('g')
+      .attr('class', 'x-axis')
+      .attr('transform', `translate(${margin.left}, ${height-margin.bottom})`)
+      .call(axisBottom(xScale));
+
+    //xAxis.call(axisBottom(xScale));
+
   }
 
   function renderChart() {
