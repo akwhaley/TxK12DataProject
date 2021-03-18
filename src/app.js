@@ -45,10 +45,32 @@ function myVis(data) {
   console.log(campuses);
 
   let xCol = columns[6];
-  let yCol = columns[8];
+  let yCol = columns[2];
+
+  const context = select('#app')
+    .append('div')
+    .attr('id', 'context')
+    .attr('width', '500px')
+
+  const contextHeader = select('#context')
+    .append('div')
+    .attr('id', 'context-header')
+    .append('text')
+    .text('About Accountability Ratings in Texas');
+
+  const contextBody = select('#context')
+    .append('div')
+    .attr('id', 'context-body')
+    .append('text')
+    .text("Every public school in Texas receives an overall rating score between 0 and 100 every school year.  The overall score is a combination of three domain scores.  The first domain is Student Achievement and is based mainly on state test scores.  The second domain is Academic Growth and is based on whether and by how much state test scores have increased from the previous year.  The third domain is Closing the Gaps and is based on the relative performance of specific student groups of students.  More information can be found here.  The scatterplot allows you to explore how the (weighted) average scores for every school district in the state relate to the characterstics of the students in that district.  A good rating system should capture the quality of education regardless of the demographics of the students attending each school.  We can see from this data that for schools with lower fractions of students who are deemed 'economically disadvantaged', we see that most have higher scores in all categories.  For schools with higher fractions, we see a wider range of scores.  We developed a model that uses a school's student characteristics and predicts its Overall Score based on how similar schools score.  We then compute an 'overperformance' score that is the difference between the actual score and the predicted score.  We may be able to use this to find school districts that are outperforming similar districts.  Clicking on a data point will open a panel below with more information.")
+
+  const scatterPlot = select('#app')
+    .append('div')
+    .style('display', 'flex')
+    .attr('id', 'scatterPlot');
 
   //Add two divs within #app - one for each dropdown.  Bind data
-  const dropdowns = select('#app')
+  const dropdowns = select('#scatterPlot')
     .append('div')
     .style('display', 'flex')
     .selectAll('.drop-down')
@@ -77,7 +99,7 @@ function myVis(data) {
       d.dim === 'xAxis' ? d.column === xCol : d.column === yCol,
     );
 
-  const svgContainer = select('#app')
+  const svgContainer = select('#scatterPlot')
     .append('div')
     .attr('class', 'chart-container')
     .style('position', 'relative');
@@ -157,13 +179,13 @@ function myVis(data) {
   function clickAndLog(d) {
     console.log(d.DistrictID);
     console.log(campuses[d.DistrictID]);
-    const sidePanel = select('#app')
+    const bottomPanel = select('#app')
       .append('div')
-      .attr('class', 'side-panel')
+      .attr('id', 'bottom-panel')
       .style('position', 'relative');
 
-    sidePanel.append('text')
-      .attr('class', 'sp-title')
+    bottomPanel.append('text')
+      .attr('id', 'bp-title')
       .text(campuses[d.DistrictID][0]['CampusName']);
   }
 
@@ -203,8 +225,8 @@ function myVis(data) {
       .on('mouseenter', (e, d) =>
         tooltip
           .style('display', 'block')
-          .style('left', `${e.pageX+5}px`)
-          .style('top', `${e.pageY-40}px`)
+          .style('left', `${e.pageX-300}px`)
+          .style('top', `${e.pageY-150}px`)
           .html('District: ' + d.DistrictName + "<br/>" +
                 'Region: ' + d.RegionName + "<br/>" +
                 'Student Count: ' + d.StudentCount + "<br/>" +
