@@ -78,6 +78,7 @@ function myVis(data) {
   const dropdowns = select('#scatterPlot')
     .append('div')
     .style('display', 'flex')
+    .attr('id', 'dropdowns')
     .selectAll('.drop-down')
     .data(['xAxis', 'yAxis'])
     .join('div');
@@ -103,6 +104,11 @@ function myVis(data) {
     .property('selected', d =>
       d.dim === 'xAxis' ? d.column === xCol : d.column === yCol,
     );
+
+  const searchBox = select("scatterPlot")
+    .append('div')
+    .attr('id', 'searchBox')
+    .data(unique(districtData, 'DistrictName'))
 
   const svgContainer = select('#scatterPlot')
     .append('div')
@@ -460,7 +466,7 @@ function myVis(data) {
       .on('mouseenter', (e, d) =>
         tooltip
           .style('display', 'block')
-          .style('left', `${e.pageX-300}px`)
+          .style('left', `${e.pageX-345}px`)
           .style('top', `${e.pageY-150}px`)
           .html('District: ' + d.DistrictName + "<br/>" +
                 'Region: ' + d.RegionName + "<br/>" +
