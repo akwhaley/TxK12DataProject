@@ -46,6 +46,13 @@ function myVis(data) {
     return acc;
   }, {});
 
+  //Map district names to numbers for the search box with autocomplete.
+  let districtNames = districtData.reduce((acc, row) => {
+    acc[row['DistrictName']] = row['DistrictID'];
+    return acc;
+  }, {});
+
+
   //Default columns for x and y axis.
   let xCol = columns[6];
   let yCol = columns[2];
@@ -105,10 +112,6 @@ function myVis(data) {
       d.dim === 'xAxis' ? d.column === xCol : d.column === yCol,
     );
 
-  const searchBox = select("scatterPlot")
-    .append('div')
-    .attr('id', 'searchBox')
-    .data(unique(districtData, 'DistrictName'))
 
   const svgContainer = select('#scatterPlot')
     .append('div')
