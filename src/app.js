@@ -10,8 +10,8 @@ import {interpolateTurbo} from 'd3-scale-chromatic';
 import './main.css';
 
 // DEFINE VARIABLES
-const height = 600;
-const width = 1000;
+const height = 700;
+const width = 900;
 const margin = {top: 10, left: 50, right: 300, bottom: 50};
 const plotWidth = width - margin.left - margin.right;
 const plotHeight = height - margin.top - margin.bottom;
@@ -36,7 +36,7 @@ function myVis(data) {
                    'StudentAchievementScoreMean', 'AcademicGrowthScoreMean',
                    'ClosingGapsScoreMean', 'EconomicallyDisadvantagedPct',
                    'LEPPct', 'OverperformanceScoreMean']
-  
+
   //Reformat campus data as an Object of objects where keys are district ids.
   let campuses = campusData.reduce((acc, row) => {
     if (!acc.hasOwnProperty(row['DistrictID'])) {
@@ -54,7 +54,7 @@ function myVis(data) {
   const context = select('#app')
     .append('div')
     .attr('id', 'context')
-    .attr('width', '500px')
+    .attr('width', '700px')
 
   const contextHeader = select('#context')
     .append('div')
@@ -66,7 +66,7 @@ function myVis(data) {
     .append('div')
     .attr('id', 'context-body')
     .append('html')
-    .html("<p>Every public school in Texas receives an overall rating score between 0 and 100 every school year.  The overall score is a combination of three domain scores - Student Achievement, Academic Growth, and Closing the Gaps.  More information can be found <a href=https://tea.texas.gov/texas-schools/accountability/academic-accountability>here</a>.</p><p>The scatterplot to the right allows you to explore how the (weighted) average scores for every school district in the state relate to the characterstics of the students in that district.  A good rating system should capture the quality of education regardless of the demographics of the students attending each school.  We can see from this data that for schools with lower fractions of students who are deemed 'economically disadvantaged', most have higher scores in all categories.  For schools with higher fractions, we see a wider range of scores.</p><p>This model uses a school's student characteristics and predicts its overall score based on the average score for similar schools.  The 'overperformance' score in the scatterplot is the difference between the actual score and the predicted score.  Clicking on a data point will open a panel below with campus level data for further exploration.</p>")
+    .html("<p>Every public school in Texas receives an overall rating score between 0 and 100 every school year.  The overall score is a combination of three domain scores - Student Achievement, Academic Growth, and Closing the Gaps.  More information can be found <a href=https://tea.texas.gov/texas-schools/accountability/academic-accountability>here</a>.</p><p>The scatterplot to the right allows you to explore how the (weighted) average scores for every school district in the Texas relate to the characterstics of the students in that district.  A good rating system should capture the quality of education regardless of the demographics of the students attending each school.  We can see from this data that for schools with lower fractions of students who are deemed 'economically disadvantaged', most have higher scores in all domains.  For schools with higher fractions, we see a wider range of scores.</p><p>'LEPPct' refers to the percentage of students in the district with Limited English Proficiency.  'SPEDPct: percentage of students who are designated Special Education.  'EconomicallyDisadvantagedPct' refers to the percentage of students who qualify for free or reduced price lunch. </p><p>This model uses a school's student characteristics to predict its overall score based on the average score for similar schools.  The 'overperformance' score in the scatterplot is the difference between the actual score and the predicted score.  A positive overperformance score means a school outperformed similar schools.  Hovering over a data point will reveal school district statistics.  Clicking on a data point will open a panel below with campus level data for further exploration.</p>")
 
   //Scatterplot
   const scatterPlot = select('#app')
