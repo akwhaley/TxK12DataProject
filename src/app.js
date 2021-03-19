@@ -36,8 +36,7 @@ function myVis(data) {
                    'StudentAchievementScoreMean', 'AcademicGrowthScoreMean',
                    'ClosingGapsScoreMean', 'EconomicallyDisadvantagedPct',
                    'LEPPct', 'OverperformanceScoreMean']
-  console.log(districtData);
-
+  
   //Reformat campus data as an Object of objects where keys are district ids.
   let campuses = campusData.reduce((acc, row) => {
     if (!acc.hasOwnProperty(row['DistrictID'])) {
@@ -67,7 +66,7 @@ function myVis(data) {
     .append('div')
     .attr('id', 'context-body')
     .append('html')
-    .html("<p>Every public school in Texas receives an overall rating score between 0 and 100 every school year.  The overall score is a combination of three domain scores - Student Achievement, Academic Growth, and Closing the Gaps.  More information can be found <a href=https://tea.texas.gov/texas-schools/accountability/academic-accountability>here</a>.</p><p>The scatterplot allows you to explore how the (weighted) average scores for every school district in the state relate to the characterstics of the students in that district.  A good rating system should capture the quality of education regardless of the demographics of the students attending each school.  We can see from this data that for schools with lower fractions of students who are deemed 'economically disadvantaged', we see that most have higher scores in all categories.  For schools with higher fractions, we see a wider range of scores.</p><p>This model uses a school's student characteristics and predicts its Overall Score based on the average score for similar schools.  The 'overperformance' score is the difference between the actual score and the predicted score.  Clicking on a data point will open a panel below with more information.</p>")
+    .html("<p>Every public school in Texas receives an overall rating score between 0 and 100 every school year.  The overall score is a combination of three domain scores - Student Achievement, Academic Growth, and Closing the Gaps.  More information can be found <a href=https://tea.texas.gov/texas-schools/accountability/academic-accountability>here</a>.</p><p>The scatterplot to the right allows you to explore how the (weighted) average scores for every school district in the state relate to the characterstics of the students in that district.  A good rating system should capture the quality of education regardless of the demographics of the students attending each school.  We can see from this data that for schools with lower fractions of students who are deemed 'economically disadvantaged', most have higher scores in all categories.  For schools with higher fractions, we see a wider range of scores.</p><p>This model uses a school's student characteristics and predicts its overall score based on the average score for similar schools.  The 'overperformance' score in the scatterplot is the difference between the actual score and the predicted score.  Clicking on a data point will open a panel below with campus level data for further exploration.</p>")
 
   //Scatterplot
   const scatterPlot = select('#app')
@@ -179,6 +178,8 @@ function myVis(data) {
     .attr('id', 'tooltip')
     .style('display', 'none');
 
+
+
   function clickAndPlot(data) {
     //If the bottom panel already exists, remove it.
     select('#bottom-panel').remove();
@@ -187,11 +188,10 @@ function myVis(data) {
     const schoolData = campuses[data.DistrictID].sort((a, b) => {
       return a.Overperformance - b.Overperformance;
     });
-    console.log(schoolData);
 
     //Define variables
     const plotWidth = 500;
-    const margin = {top: 70, left: 200, right: 10, bottom: 40};
+    const margin = {top: 70, left: 200, right: 530, bottom: 50};
     const schools = unique(schoolData, 'CampusName');
     const plotHeight = 20*schools.length;
     const width = plotWidth + margin.left + margin.right;
@@ -227,7 +227,7 @@ function myVis(data) {
       .attr('height', height)
       .attr('transform', `translate(0,0)`);
 
-//Legend
+//Bottom Panel Legend
     const l = svg
       .append("g")
       .attr('class', 'dumbell-legend')
@@ -266,7 +266,7 @@ function myVis(data) {
     l.append('text')
       .attr('transform', `translate(245, 5)`)
       .style('font-size', 11)
-      .text('Actual < Predicted')
+      .text('Underperforms')
 
     l.append('line')
       .attr("stroke", d => colorScale('+'))
@@ -279,13 +279,78 @@ function myVis(data) {
     l.append('text')
       .attr('transform', `translate(405, 5)`)
       .style('font-size', 11)
-      .text('Actual > Predicted')
+      .text('Overperforms')
+
 
     svg
       .append('g')
-      .attr('class', 'x-axis')
+      .attr('id', 'bp-top-axis')
       .attr('transform', `translate(${margin.left}, ${2*margin.top/3})`)
-      .call(axisTop(xScale));
+      .call(axisTop(xScale)
+              .tickSize(-plotHeight-25));
+
+    svg
+      .append('text')
+      .attr('class', 'table-notes')
+      .attr('transform', `translate(${margin.left+plotWidth+30}, ${margin.top+plotHeight})`)
+      .text('*School types: E - Elementary, M - Middle, S - High, B - More than One')
+
+    svg
+      .append('text')
+      .attr('class', 'table-notes')
+      .attr('transform', `translate(${margin.left+plotWidth+30}, ${margin.top+plotHeight+15})`)
+      .text('**LEP - Limited English Proficiency')
+
+    svg
+      .append('text')
+      .attr('class', 'table-notes')
+      .attr('transform', `translate(${margin.left+plotWidth+30}, ${margin.top+plotHeight+30})`)
+      .text('***SPED - Special Education Status')
+
+    svg
+      .append('text')
+      .attr('class', 'table-notes')
+      .attr('transform', `translate(${margin.left+plotWidth+30}, ${margin.top+plotHeight+45})`)
+      .text('****Student mobility rate indicates the fraction of students leaving and entering the school each year.')
+
+//Table header
+    svg
+      .append('text')
+      .attr('class', 'tableHeading')
+      .attr('transform', `translate(${margin.left+plotWidth+20}, ${2*margin.top/3-5})`)
+      .style('font-size', '10px')
+      .text('Student Count')
+
+    svg
+      .append('text')
+      .attr('class', 'tableHeading')
+      .attr('transform', `translate(${margin.left+plotWidth+115}, ${2*margin.top/3-5})`)
+      .text('Type*')
+
+    svg
+      .append('text')
+      .attr('class', 'tableHeading')
+      .attr('transform', `translate(${margin.left+plotWidth+170}, ${2*margin.top/3-5})`)
+      .text('Pct Econ. Disadv.')
+
+    svg
+      .append('text')
+      .attr('class', 'tableHeading')
+      .attr('transform', `translate(${margin.left+plotWidth+275}, ${2*margin.top/3-5})`)
+      .text('Pct LEP**')
+
+    svg
+      .append('text')
+      .attr('class', 'tableHeading')
+      .attr('transform', `translate(${margin.left+plotWidth+350}, ${2*margin.top/3-5})`)
+      .text('Pct SPED***')
+
+    svg
+      .append('text')
+      .attr('class', 'tableHeading')
+      .attr('transform', `translate(${margin.left+plotWidth+425}, ${2*margin.top/3-5})`)
+      .text('Pct Mobility****')
+
 
     const g = svg.append("g")
         .attr("text-anchor", "end")
@@ -320,6 +385,37 @@ function myVis(data) {
     g.append("text")
       .text((d, i) => d.CampusName)
       .attr("x", d => Math.min(xScale(d.ModelOverallScore), xScale(d.OverallScore))-10);
+
+    g.append("line")
+      .attr("stroke", '#87762f')
+      .attr("x1", plotWidth+20)
+      .attr("y1", 5)
+      .attr("x2", width)
+      .attr("y2", 5);
+
+    g.append("text")
+      .text((d, i) => d.StudentCount)
+      .attr("x", plotWidth+60)
+
+    g.append("text")
+      .text((d, i) => d.SchoolType)
+      .attr("x", plotWidth+135)
+
+    g.append("text")
+      .text((d, i) => d.EconomicallyDisadvantagedPct)
+      .attr("x", plotWidth+220)
+
+    g.append("text")
+      .text((d, i) => d.LEPPct)
+      .attr("x", plotWidth+305)
+
+    g.append("text")
+      .text((d, i) => d.SPEDPct)
+      .attr("x", plotWidth+385)
+
+    g.append("text")
+      .text((d, i) => d.StudentMobilityPct)
+      .attr("x", plotWidth+475)
 
     svg
       .append('g')

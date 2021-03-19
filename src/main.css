@@ -78,6 +78,18 @@ body {
   font-size: 12px;
 }
 
+.tableHeading {
+  font-size: 10px;
+}
+
+.table-notes {
+  font-size: 10px;
+}
+
+#bp-top-axis line{
+  stroke: #a9a9a9;
+}
+
 #sources {
   background-color: #3a3838;
   color: #D6D6CE;
